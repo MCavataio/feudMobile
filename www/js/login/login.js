@@ -1,7 +1,11 @@
-angular.module('feud.login' [])
-.controller('LoginController', function($scope, $state, $q, UserService, $ionicLoading) {
+angular.module('feud.login', [])
+.controller('LoginController', function($scope, $state, $q, UserService, $ionicLoading, $location, Socket) {
   // This is the success callback from the login method
+  var user = UserService.getUser();
+  console.log("++++++++++++++++++++", user.userID)
+
   var fbLoginSuccess = function(response) {
+    console.log('in fbLoginSucces');
     if (!response.authResponse){
       fbLoginError("Cannot find the authResponse");
       return;
@@ -13,14 +17,17 @@ angular.module('feud.login' [])
     .then(function(profileInfo) {
       // For the purpose of this example I will store user data on local storage
       UserService.setUser({
+        friends: profileInfo.friends.data,
         authResponse: authResponse,
+        // friends: friends,
         userID: profileInfo.id,
         name: profileInfo.name,
         email: profileInfo.email,
         picture : "http://graph.facebook.com/" + authResponse.userID + "/picture?type=large"
       });
       $ionicLoading.hide();
-      $state.go('app.home');
+      console.log('in here before calling go home')
+      $state.go('home');
     }, function(fail){
       // Fail get profile info
       console.log('profile info fail', fail);
@@ -37,9 +44,8 @@ angular.module('feud.login' [])
   var getFacebookProfileInfo = function (authResponse) {
     var info = $q.defer();
 
-    facebookConnectPlugin.api('/me?fields=email,name&access_token=' + authResponse.accessToken, null,
+    facebookConnectPlugin.api('/me?fields=email,name,friends&access_token=' + authResponse.accessToken, null,
       function (response) {
-        console.log(response);
         info.resolve(response);
       },
       function (response) {
@@ -68,19 +74,20 @@ angular.module('feud.login' [])
             // For the purpose of this example I will store user data on local storage
             UserService.setUser({
               authResponse: success.authResponse,
+              friends: profileInfo.friends.data,
               userID: profileInfo.id,
               name: profileInfo.name,
               email: profileInfo.email,
               picture : "http://graph.facebook.com/" + success.authResponse.userID + "/picture?type=large"
             });
 
-            $state.go('app.home');
+            $state.go('home');
           }, function(fail){
             // Fail get profile info
             console.log('profile info fail', fail);
           });
         }else{
-          $state.go('app.home');
+          $state.go('home');
         }
       } else {
         // If (success.status === 'not_authorized') the user is logged in to Facebook,
@@ -96,8 +103,11 @@ angular.module('feud.login' [])
 
         // Ask the permissions you need. You can learn more about
         // FB permissions here: https://developers.facebook.com/docs/facebook-login/permissions/v2.4
-        facebookConnectPlugin.login(['email', 'public_profile'], fbLoginSuccess, fbLoginError);
+        console.log('should run the next line');
+        facebookConnectPlugin.login(['email', 'user_friends', 'public_profile'], fbLoginSuccess, fbLoginError);
+        
       }
     });
   };
+
 })

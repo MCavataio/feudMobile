@@ -5,12 +5,16 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('feud', [
   'ionic',
+  'ui.router',
   'feud.login',
   'feud.home',
+  'feud.friends',
+  'feud.game',
+  'feud.query',
   'feud.services'
   ])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -25,20 +29,41 @@ angular.module('feud', [
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
+
+  });
+  $rootScope.$on("$stateChangeError", function(event, toState, toParams, fromState, fromParams, error) {
+    console.log("stateChangeError:");
+    console.log(arguments);
   });
 })
 
-.config(function($stateProvider, #urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
     .state('login', {
+      cache: 'false',
       url: '/login',
-      templateUrl: 'js/login/login.html',
+      templateUrl: './js/login/login.html',
       controller: 'LoginController'
     })
     .state('home', {
       url: '/home',
-      templateUrl: 'js/home/home.html',
+      templateUrl: './js/home/home.html',
       controller: 'HomeController'
     })
-    $urlRouterProvider.otherwise('/welcome')
+    .state('friends', {
+      url: '/home',
+      templateUrl: './js/friends/friends.html',
+      controller: 'FriendsController'
+    })
+    .state('game', {
+      url: '/game',
+      templateUrl: './js/game/game.html',
+      controller: 'GameController'
+    })
+    .state('query', {
+      url: '/query',
+      templateUrl: './js/query/query.html',
+      controller: 'QueryController'
+    })
+    $urlRouterProvider.otherwise('/login')
 })

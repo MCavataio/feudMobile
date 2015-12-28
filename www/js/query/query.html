@@ -1,0 +1,21 @@
+<ion-view view-title="query">
+  <ion-content class="padding">
+  <ion-a class="button" ng-click='home'>home</ion-a>
+  <div class="list list-inset">
+    <form ng-submit="viewQuery()">
+      <label class="item item-input">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="text" ng-model="query.search" placeholder="View Your Google Search">
+      </label>
+    </form>
+  </div> 
+  <div ng-if="showResponses"> 
+  <ion-list>
+    <ion-item ng-repeat="item in query.return track by $index">
+      {{item}}
+    </ion-item>
+  </ion-list>
+  <ion-a class="button" ng-click='addPotential()'>Submit Search</ion-a>
+</div>
+</ion-content>
+</ion-view>
