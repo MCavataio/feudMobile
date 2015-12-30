@@ -1,15 +1,25 @@
 angular.module('feud.home', [])
-.controller('HomeController', function($scope, UserService, $ionicActionSheet, $state, $ionicLoading, Socket){
+.controller('HomeController', function($rootScope, $scope, UserService, $ionicActionSheet, $state, $ionicLoading, Socket){
   $scope.user = UserService.getUser();
+  $scope.games = {};
 
   $scope.query = function() {
     $state.go('query');
   }
+  $scope.$on('$ionicView.enter', function() {
+    console.log('i was called')
+    Socket.emit('updateHome', $rootScope.user)
+  });
+  Socket.on('updateHome', function(data) {
+    $scope.games.live = data;
+  })
   $scope.init = function() {
+    $rootScope.user = $scope.user.name
     var user = {
       name: $scope.user.name
     }
-    Socket.emit('userInfo', user);
+    console.log('hello')
+    Socket.emit('userInfo', user); 
   }
   $scope.playRandom = function() {
     console.log('initlizing play')

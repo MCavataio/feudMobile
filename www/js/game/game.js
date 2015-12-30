@@ -10,8 +10,8 @@ angular.module('feud.game', [])
   $scope.scoreBoard.opponentScore = 0;
   $scope.queryAnswer = {};
   $scope.lightningRound = false;
-  $scope.yerr = {};
-  var gameTimer = 20;
+  var gameTimer = 5;
+
 
   $scope.$on('$ionicView.enter', function() {
     init()
@@ -25,7 +25,7 @@ angular.module('feud.game', [])
   function init() {
     $scope.resultBoard = false;
     console.log('i was called again')
-    startRound($rootScope.dbQuestion.question);
+    startRound($rootScope.dbQuestion);
     $scope.queryAnswer = {};
   };
   var startRound = function(query) {
