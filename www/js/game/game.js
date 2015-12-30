@@ -30,21 +30,46 @@ angular.module('feud.game', [])
   };
   var startRound = function(query) {
     $scope.gameBoard = true;
-    console.log('in startRound');
-    $scope.questions = parsedResponses(query, false);
-    $scope.scoreBoard.round = 1;
-    $scope.scoreBoard.total = 0;
-    $scope.scoreBoard.roundScore = 0;
-    console.log($scope.questions);
-    gameInfo($scope.questions, 1);
-    timer(gameTimer, revealAnswers);
+    console.log(query.question)
+    if (query.question.length === 2) {
+      if (query.user === 'user2') {
+        $scope.questions = parsedResponses(query.question, true)
+        setScoreBoard(1, 0, 0)
+        console.log($scope.questions)
+        gameInfo($scope.questions, 1);
+        $rootScope.double = true;
+        timer(gameTimer, revealAnswers)
+      } else {
+        $scope.questions = parsedResponses(query, true);
+        setScoreBoard(2, 0, 0)
+        gameInfo($scope.questions, 1);
+        $rootScope.double = true;
+        timer(gameTimer, revealAnswers)
+      }
+    } else {
+      $scope.questions = parsedResponses(query, false);
+      setScoreBoard(1, 0, 0);
+      gameInfo($scope.questions, 1);
+      $rootScope.double = false;
+      timer(gameTimer, revealAnswers);
+    }
   };
+  var setScoreBoard = function(round, total, roundScore) {
+    $scope.scoreBoard.round = round;
+    $scope.scoreBoard.total = total;
+    $scope.scoreBoard.roundScore = roundScore;
+  }
 
   var revealAnswers = function() {
-    updateScore()
     $scope.gameBoard = false;
     gameInfo($scope.questions, $scope.scoreBoard.round, "reveal")
     $scope.resultBoard = true;
+    if($rootScope.double) {
+      timer(3, nextRound)
+    } else {
+      updateScore()
+    }
+
   }
 
   var updateScore = function() {
@@ -57,7 +82,33 @@ angular.module('feud.game', [])
     Socket.emit('updateScore', score)
   }
 
-   var gameInfo = function(query, number, round) {
+  var nextRound = function() {
+    
+    // $scope.scoreBoard.total = $scope.scoreBoard.total + roundScore || 0;
+    $scope.resultBoard = false;
+    $scope.gameBoard = true;
+    // Socket.emit('updateScore', $scope.scoreBoard.total);
+    $scope.scoreBoard.roundScore = 0;
+    if ($rootScope.double) {
+      $rootScope.double = false;
+      $scope.scoreBoard.round++
+      gameInfo($scope.questions, 2)
+      timer(gameTimer, revealAnswers)
+    }
+    // if ($scope.scoreBoard.round < 3) {
+    //   $scope.scoreBoard.round++
+    //   console.log('in nextRound')
+    //   gameInfo($scope.questions, $scope.scoreBoard.round)
+    //   timer(gameTimer, nextRound)
+    // } 
+    else {
+      $scope.lightningRound = true;
+      $scope.gameBoard = false;
+      lightningRound();
+    }
+  }
+
+     var gameInfo = function(query, number, round) {
     number = number - 1
     $scope.query.title = query[number].title;
     if (round === "lightning") {
@@ -75,6 +126,7 @@ angular.module('feud.game', [])
       $scope.query.choices = shuffle(temp)
     }
   }
+
   function shuffle(array) {
     var counter = array.length, temp, index;
     // While there are elements in the array
@@ -150,39 +202,46 @@ angular.module('feud.game', [])
         // add to total score
         $scope.scoreBoard.total += scoreValues[index];
     };
-    var parsedResponses = function (data, isLightning) {
-      // refactor to have constant time look up for score values
-      var questions = {};
-      if (!isLightning) {
-        questions[0] = {
-          title: data.title,
-          responses: []
-        };
-        for(var i = 0; i < 5; i++) {
-          var queryResponse = "response" + (i + 1);
-          if (data[queryResponse]) {
-          questions[0].responses.push(data[queryResponse])
+  var parsedResponses = function (data, isLightning) {
+    // refactor to have constant time look up for score values
+    var questions = {}
+    if (!isLightning) {
+      questions[0] = {
+        title: data.title,
+        responses: []
+      }
+      for (var i = 0; i < 5; i++) {
+        var queryResponse = "response" + (i + 1);
+        if (data[queryResponse]) {
+        questions[0].responses.push(data[queryResponse])    
+        }
+      }
+    }
+      // _.each(data, function(query, qNum) {
+      //   if(query) {
+      //     questions[qNum] = {
+      //       title: query.title,
+      //       responses: []
+      //   }
+    if(isLightning) {
+      for (var i = 0; i < data.length; i++) {
+        var query = data[i]
+        if(query) {
+          questions[i] = {
+            title: query.title,
+            responses: []
+          }
+        }
+        for (var b = 0; b < 5; b++) {
+          var queryResponse = "response" + (b + 1);
+          if (query[queryResponse]) {
+            questions[i].responses.push(query[queryResponse])
           }
         }
       }
-      if(isLightning) {
-        _.each(data, function(query, qNum) {
-          if(query) {
-            questions[qNum] = {
-              title: query.title,
-              responses: []
-          }
-          for (var i = 0; i < 5; i++) {
-            var queryResponse = "response" + (i + 1);
-            if (query[queryResponse]) {
-              questions[qNum].responses.push(query[queryResponse])
-            }
-          }
-        }
-      })
     }
-    return questions
-    }
+  return questions
+  }
     var timer = function (time, cb) {
       $scope.counter = time;
       $scope.onTimeout = function() {
