@@ -5,8 +5,7 @@ angular.module('feud.home', [])
   $scope.query = function() {
     $state.go('query');
   }
-  $scope.test = function() {
-    console.log('initializing test')
+  $scope.init = function() {
     var user = {
       name: $scope.user.name
     }
@@ -26,8 +25,8 @@ angular.module('feud.home', [])
   $scope.friends = function() {
     $state.go('friends');  
   }
-  $scope.game = function() {
-    $state.go('game');
+  $scope.newGame = function() {
+    $state.go('newGame');
   }
 
   $scope.showLogOutMenu = function() {

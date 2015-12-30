@@ -1,6 +1,6 @@
-<div ng-controller="GameController">
-  <ion-button type="button" id="lobby" ng-click="toLobby()">Lobby</ion-button>
-  
+<ion-view view-title="game">
+  <ion-content class="padding">
+  <ion-a class="button" ng-click='home()'>Home</ion-a>
   <div ng-if="gameBoard">
     <div ng-if="query.title">
       <h3>Total Score: {{scoreBoard.total}}</h3>
@@ -27,6 +27,15 @@
       </br>
     </div>
   </div>
-      <h3> Opponent Name: {{scoreBoard.opponentName}} </h3>
-      <h3> Opponent Score: {{scoreBoard.opponentScore}} </h3>
-</div>
+  <div ng-if="resultBoard">
+     <h2> Your Score: {{scoreBoard.total}} <h2>
+      <h2> Opponent's Score: </h2>
+     <h2> Question: {{query.title}} <h2>
+    <div ng-repeat="response in query.choices track by $index">
+      <h4>{{$index + 1}}. {{response}}</h4>
+    </div>
+  </div>
+
+
+</ion-content>
+</ion-view>

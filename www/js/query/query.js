@@ -5,7 +5,10 @@ angular.module('feud.query', [])
   $scope.showResponses = false;
 
   $scope.home = function() {
-    state.go('home');
+    $state.go('home');
+  }
+  $scope.addPotential = function() {
+    Socket.emit('addPotential', $scope.query);
   }
 
   $scope.viewQuery = function() {
@@ -36,6 +39,7 @@ angular.module('feud.query', [])
         
         $scope.$apply(function() {
           $scope.showResponses = true;
+          $scope.query = query;
           $scope.query.return = responses.slice(0,5);
         });
       })

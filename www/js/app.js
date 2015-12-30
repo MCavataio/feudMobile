@@ -11,6 +11,7 @@ angular.module('feud', [
   'feud.friends',
   'feud.game',
   'feud.query',
+  'feud.newGame',
   'feud.services'
   ])
 
@@ -64,6 +65,11 @@ angular.module('feud', [
       url: '/query',
       templateUrl: './js/query/query.html',
       controller: 'QueryController'
+    })
+    .state('newGame', {
+      url: '/newGame',
+      templateUrl: './js/newGame/newGame.html',
+      controller: 'NewGameController'
     })
     $urlRouterProvider.otherwise('/login')
 })
