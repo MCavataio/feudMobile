@@ -45,7 +45,7 @@ angular.module('feud.home', [])
         queries.push(game.questionRD3);
       }
       if (game.round === 4) {
-        queries.push(game.questionRD4);
+        queries = game.questionRD4.split("A");
       }
     }
     Socket.emit('getQueries', queries);

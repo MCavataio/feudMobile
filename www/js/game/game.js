@@ -45,7 +45,10 @@ angular.module('feud.game', [])
         $rootScope.double = true;
         timer(gameTimer, revealAnswers)
       }
-    } else {
+    } else if(query.question.length === 5) {
+      console.log(lightning)
+    }
+     else {
       if ($rootScope.gameInformation) {
         if ($rootScope.gameInformation.round === 3) {
           setScoreBoard($rootScope.gameInformation.round, 0, 0)
