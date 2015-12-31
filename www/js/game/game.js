@@ -24,32 +24,37 @@ angular.module('feud.game', [])
   
   function init() {
     $scope.resultBoard = false;
-    console.log('i was called again')
     startRound($rootScope.dbQuestion);
     $scope.queryAnswer = {};
   };
   var startRound = function(query) {
     $scope.gameBoard = true;
-    console.log(query.question)
+    console.log(query);
     if (query.question.length === 2) {
       if (query.user === 'user2') {
-        $scope.questions = parsedResponses(query.question, true)
         setScoreBoard(1, 0, 0)
-        console.log($scope.questions)
-        gameInfo($scope.questions, 1);
+        $scope.questions = parsedResponses(query.question, true)
+        gameInfo($scope.questions, $scope.scoreBoard.round, "lightning");
         $rootScope.double = true;
         timer(gameTimer, revealAnswers)
       } else {
-        $scope.questions = parsedResponses(query, true);
+        console.log(' in else yeaaaaaa')
         setScoreBoard(2, 0, 0)
-        gameInfo($scope.questions, 1);
+        $scope.questions = parsedResponses(query.question, true);
+        gameInfo($scope.questions, $scope.scoreBoard.round, "lightning");
         $rootScope.double = true;
         timer(gameTimer, revealAnswers)
       }
     } else {
-      $scope.questions = parsedResponses(query, false);
-      setScoreBoard(1, 0, 0);
-      gameInfo($scope.questions, 1);
+      if ($rootScope.gameInformation) {
+        if ($rootScope.gameInformation.round === 3) {
+          setScoreBoard($rootScope.gameInformation.round, 0, 0)
+        } 
+      } else {
+          setScoreBoard(1, 0, 0);
+        }
+      $scope.questions = parsedResponses(query.question, false);
+      gameInfo($scope.questions, $scope.scoreBoard.round);
       $rootScope.double = false;
       timer(gameTimer, revealAnswers);
     }
@@ -74,12 +79,30 @@ angular.module('feud.game', [])
 
   var updateScore = function() {
     var score = {
-      gameID: $rootScope.dbQuestion.game,
-      userCol: $rootScope.dbQuestion.user,
       score: $scope.scoreBoard.roundScore,
-      round: $scope.scoreBoard.round
+      round: $scope.scoreBoard.round,
+    }
+    if (!$rootScope.gameInformation) {
+      if (score.userCol == 'user2' && score.score !== 2) {
+        if ($scope.scoreBoard.round == 3) {
+          score.round = 4;         
+        } else {
+          score.round = 5;
+        }
+      }
+      if (score.userCol == 'user')
+        score.gameID   = $rootScope.dbQuestion.game,
+        score.userCol  = $rootScope.dbQuestion.user,
+        score.opponent = $rootScope.dbQuestion.opponent
+    } else {
+      console.log('should be running this')
+      score.gameID = $rootScope.gameInformation.gameID  ,
+      score.userCol = $rootScope.gameInformation.user,
+      score.opponent = $rootScope.gameInformation.opponent
+
     }
     Socket.emit('updateScore', score)
+    $rootScope.gameInformation = false;
   }
 
   var nextRound = function() {
@@ -92,7 +115,7 @@ angular.module('feud.game', [])
     if ($rootScope.double) {
       $rootScope.double = false;
       $scope.scoreBoard.round++
-      gameInfo($scope.questions, 2)
+      gameInfo($scope.questions, $scope.scoreBoard.round, "lightning")
       timer(gameTimer, revealAnswers)
     }
     // if ($scope.scoreBoard.round < 3) {
@@ -108,8 +131,8 @@ angular.module('feud.game', [])
     }
   }
 
-     var gameInfo = function(query, number, round) {
-    number = number - 1
+  var gameInfo = function(query, number, round) {
+    // number = number - 1
     $scope.query.title = query[number].title;
     if (round === "lightning") {
       $scope.query.responses = query[number].responses;
@@ -119,8 +142,7 @@ angular.module('feud.game', [])
     if (round === "reveal") {
       var temp = query[number].responses.slice(0)
       $scope.query.choices = temp;
-    }
-      else {
+    }  else {
       var temp = query[number].responses.slice(0)
       $scope.query.responses = query[number].responses
       $scope.query.choices = shuffle(temp)
@@ -206,14 +228,14 @@ angular.module('feud.game', [])
     // refactor to have constant time look up for score values
     var questions = {}
     if (!isLightning) {
-      questions[0] = {
-        title: data.title,
+      questions[$scope.scoreBoard.round] = {
+        title: data[0].title,
         responses: []
       }
       for (var i = 0; i < 5; i++) {
         var queryResponse = "response" + (i + 1);
-        if (data[queryResponse]) {
-        questions[0].responses.push(data[queryResponse])    
+        if (data[0][queryResponse]) {
+        questions[$scope.scoreBoard.round].responses.push(data[0][queryResponse])    
         }
       }
     }
@@ -224,8 +246,13 @@ angular.module('feud.game', [])
       //       responses: []
       //   }
     if(isLightning) {
-      for (var i = 0; i < data.length; i++) {
-        var query = data[i]
+      var round = $scope.scoreBoard.round
+      var length = data.length + round;
+      console.log(round)
+      var num = 0;
+      for (var i = round; i < length; i++) {
+        console.log(i, length, '++++++++')
+        var query = data[num]
         if(query) {
           questions[i] = {
             title: query.title,
@@ -237,7 +264,8 @@ angular.module('feud.game', [])
           if (query[queryResponse]) {
             questions[i].responses.push(query[queryResponse])
           }
-        }
+        } 
+        num++;
       }
     }
   return questions

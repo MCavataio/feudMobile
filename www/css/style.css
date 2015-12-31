@@ -2,3 +2,7 @@
 .photo {
   border-radius: 50px;
 }
+
+.turn {
+  border: 1px solid black;
+}

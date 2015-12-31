@@ -6,7 +6,19 @@
 <ion-a class="button" ng-click='newGame()'>New Game</ion-a>
 <ion-a class="button" ng-click='test()'>Test</ion-a>
 <ion-a class="button" ng-click='query()'>Query</ion-a>
-{{games.live}}
+
+<ion-list ng-if="games.yourTurn">
+  <h3> Your Turn: </h3>
+  <ion-item ng-repeat="game in games.yourTurn">
+      <div class="enable-pointer-events" ng-click="startGame(game)"> It's your turn against: {{game.opponentName}} round:{{game.round}}</div>                                            
+  </ion-item>
+</ion-list>
+<ion-list ng-if="games.opponentTurn">
+  <h3> Opponent Turn </h3>
+  <ion-item ng-repeat="game in games.opponentTurn">
+    <div class = "enable-pointer-events" ng-click="startGame(game)"> Waiting for {{game.turn}} to play....round: {{game.round}} </div>
+</ion-item>
+</ion-list>
 
   </ion-content>
 </ion-view>
