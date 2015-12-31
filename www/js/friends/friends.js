@@ -11,6 +11,16 @@ angular.module('feud.friends', [])
     $scope.play = function(friend) {
         console.log(friend.name)
     }
+    $scope.challenge = function(friend) {
+        console.log("in here")
+        var gameInfo = {
+            user2: friend.name,
+            user2ID: friend.userID,
+            user1: $scope.user.name,
+            user1ID: $scope.user.userID
+        }
+        // Socket.emit('playFriend', gameInfo)
+    }
     $scope.home = function() {
         $state.go('home');
     }
