@@ -34,13 +34,16 @@ angular.module('feud.home', [])
     }
     if (isUser1) {
       if (game.round == 2) {
-        queries.push(game.questionRD2);
         queries.push(game.questionRD3);
+        queries.push(game.questionRD2);
       }
       if (game.round === 4) {
-        queries.push(game.questionRD4);
+        queries = game.questionRD4.split("A");
       }
     } else {
+      if (game.round === 2) {
+
+      }
       if (game.round === 3) {
         queries.push(game.questionRD3);
       }

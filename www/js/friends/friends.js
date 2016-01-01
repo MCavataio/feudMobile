@@ -6,13 +6,12 @@ angular.module('feud.friends', [])
         console.log(UserService.getUser())
         var user  = UserService.getUser();
         $scope.user = user
-        console.log(user)
+        console.log(user.friends, "++++++++++++++++++++++++++++++")
     }
     $scope.play = function(friend) {
         console.log(friend.name)
     }
     $scope.challenge = function(friend) {
-        console.log("in here")
         var gameInfo = {
             user2: friend.name,
             user2ID: friend.userID,

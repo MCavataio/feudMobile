@@ -9,19 +9,12 @@
 
 <ion-view view-title="friends" ng-init="init()">
     <ion-content class="has-header">
-    <div ng-repeat="friend in user.friends | orderBy: '-name'" ng-click="challenge(friend)">
-        <img class='photo' ng-src="https://graph.facebook.com/{{ friend.id }}/picture?width=75&height=75" />
+    <ion-list>
+    <ion-item ng-repeat="friend in user.friends | orderBy: '-name'" ng-click="challenge(friend)"><img class='photo' ng-src="https://graph.facebook.com/{{ friend.id }}/picture?width=50&height=50" /> 
         <span ng-click="play(friend)"> {{friend.name}} </span>
-    </div>
-        <div class="list card">
-            <div class="item">
-                <h2>{{user.name}}</h2>
-                <p>{{user.userID}}
-            </div>
-            <div class="item item-body">
-                <img ng-src="https://graph.facebook.com/{{ user.userID }}/picture?width=100&height=100" />
-            </div>
-        </div>
+    </ion-item>
+  </ion-list>
+        
         <ion-a class="button" ng-click='home()'>Home</ion-a>
     </ion-content>
 </ion-view>

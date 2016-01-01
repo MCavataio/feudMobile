@@ -11,6 +11,7 @@ angular.module('feud.game', [])
   $scope.queryAnswer = {};
   $scope.lightningRound = false;
   var gameTimer = 5;
+  var lightning = 5;
 
 
   $scope.$on('$ionicView.enter', function() {
@@ -23,6 +24,7 @@ angular.module('feud.game', [])
   };
   
   function init() {
+    setScoreBoard(0,0,0)
     $scope.resultBoard = false;
     startRound($rootScope.dbQuestion);
     $scope.queryAnswer = {};
@@ -46,7 +48,9 @@ angular.module('feud.game', [])
         timer(gameTimer, revealAnswers)
       }
     } else if(query.question.length === 5) {
-      console.log(lightning)
+      setScoreBoard(4, 0, 0)
+      $scope.questions = parsedResponses(query.question, true);
+      nextRound()
     }
      else {
       if ($rootScope.gameInformation) {
@@ -85,27 +89,44 @@ angular.module('feud.game', [])
       score: $scope.scoreBoard.roundScore,
       round: $scope.scoreBoard.round,
     }
-    if (!$rootScope.gameInformation) {
-      if (score.userCol == 'user2' && score.score !== 2) {
+    if ($rootScope.gameInformation) {
+      console.log($rootScope.gameInformation.user, '++++++++++')
+      if ($rootScope.gameInformation.user == 'user2' && score.round !== 2) {
+        console.log($scope.scoreBoard.round, '-------------------')
         if ($scope.scoreBoard.round == 3) {
+          console.log('setting round')
           score.round = 4;         
-        } else {
-          score.round = 5;
+        }else if ($scope.scoreBoard.round == 8) {
+          score.round = 5
         }
-      }
-      if (score.userCol == 'user')
+      } else 
+        if ($scope.scoreBoard.round == 8) {
+          score.round = 4
+        }
+      score.gameID = $rootScope.gameInformation.gameID,
+      score.userCol = $rootScope.gameInformation.user,
+      score.opponent = $rootScope.gameInformation.opponent
+    } else {
+
         score.gameID   = $rootScope.dbQuestion.game,
         score.userCol  = $rootScope.dbQuestion.user,
         score.opponent = $rootScope.dbQuestion.opponent
-    } else {
-      console.log('should be running this')
-      score.gameID = $rootScope.gameInformation.gameID  ,
-      score.userCol = $rootScope.gameInformation.user,
-      score.opponent = $rootScope.gameInformation.opponent
-
-    }
+      }
+    console.log(score.round, "before being sent to socket")
     Socket.emit('updateScore', score)
     $rootScope.gameInformation = false;
+  }
+
+  var lightningRound = function() {
+    if ($scope.scoreBoard.round <= 7) {
+        $scope.showRound = true;
+        $scope.scoreBoard.round++
+        gameInfo($scope.questions, $scope.scoreBoard.round, true)
+        timer(2, lightningRound)
+      } else {
+        $scope.showRound = false;
+        updateScore()
+      }
   }
 
   var nextRound = function() {
@@ -128,8 +149,10 @@ angular.module('feud.game', [])
     //   timer(gameTimer, nextRound)
     // } 
     else {
+      console.log('in here')
       $scope.lightningRound = true;
       $scope.gameBoard = false;
+      $scope.scoreBoard.round = 3;
       lightningRound();
     }
   }
@@ -251,8 +274,8 @@ angular.module('feud.game', [])
     if(isLightning) {
       var round = $scope.scoreBoard.round
       var length = data.length + round;
-      console.log(round)
-      var num = 0;
+      console.log(length,round, "|||||||||||||||||||||||||||||||||")
+      var num = length - round - 1;
       for (var i = round; i < length; i++) {
         console.log(i, length, '++++++++')
         var query = data[num]
@@ -268,7 +291,7 @@ angular.module('feud.game', [])
             questions[i].responses.push(query[queryResponse])
           }
         } 
-        num++;
+        num--;
       }
     }
   return questions
