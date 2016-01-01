@@ -41,8 +41,11 @@ angular.module('feud.home', [])
         queries = game.questionRD4.split("A");
       }
     } else {
-      if (game.round === 2) {
-
+      if (game.round === 1) {
+        console.log('in here pushing two rounds lets go')
+        $rootScope.gameInformation.friendly = true;
+        queries.push(game.questionRD2);
+        queries.push(game.questionRD1);
       }
       if (game.round === 3) {
         queries.push(game.questionRD3);

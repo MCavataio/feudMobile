@@ -34,6 +34,7 @@ angular.module('feud.game', [])
     console.log(query);
     if (query.question.length === 2) {
       if (query.user === 'user2') {
+        console.log('in right here getting ready to set scoreboard')
         setScoreBoard(1, 0, 0)
         $scope.questions = parsedResponses(query.question, true)
         gameInfo($scope.questions, $scope.scoreBoard.round, "lightning");
@@ -41,7 +42,13 @@ angular.module('feud.game', [])
         timer(gameTimer, revealAnswers)
       } else {
         console.log(' in else yeaaaaaa')
-        setScoreBoard(2, 0, 0)
+        console.log(query.userCol)
+        if ($rootScope.gameInformation.user === 'user2') {
+          console.log('setting round to 1')
+          setScoreBoard(1, 0, 0)
+        } else {
+          setScoreBoard(2, 0, 0)
+        }
         $scope.questions = parsedResponses(query.question, true);
         gameInfo($scope.questions, $scope.scoreBoard.round, "lightning");
         $rootScope.double = true;
@@ -51,8 +58,7 @@ angular.module('feud.game', [])
       setScoreBoard(4, 0, 0)
       $scope.questions = parsedResponses(query.question, true);
       nextRound()
-    }
-     else {
+    } else {
       if ($rootScope.gameInformation) {
         if ($rootScope.gameInformation.round === 3) {
           setScoreBoard($rootScope.gameInformation.round, 0, 0)
@@ -85,21 +91,27 @@ angular.module('feud.game', [])
   }
 
   var updateScore = function() {
+    console.log('in updatae Score')
     var score = {
       score: $scope.scoreBoard.roundScore,
       round: $scope.scoreBoard.round,
     }
     if ($rootScope.gameInformation) {
-      console.log($rootScope.gameInformation.user, '++++++++++')
       if ($rootScope.gameInformation.user == 'user2' && score.round !== 2) {
-        console.log($scope.scoreBoard.round, '-------------------')
         if ($scope.scoreBoard.round == 3) {
-          console.log('setting round')
           score.round = 4;         
         }else if ($scope.scoreBoard.round == 8) {
           score.round = 5
         }
-      } else 
+      } if($rootScope.gameInformation.friendly) {
+        if ($rootScope.gameInformation.user == 'user2') {
+          if (score.round == 2) {
+            score.round = 2;
+            $rootScope.gameInformation.friendly = false;
+          }
+        }
+      }
+      else 
         if ($scope.scoreBoard.round == 8) {
           score.round = 4
         }
@@ -107,15 +119,23 @@ angular.module('feud.game', [])
       score.userCol = $rootScope.gameInformation.user,
       score.opponent = $rootScope.gameInformation.opponent
     } else {
-
-        score.gameID   = $rootScope.dbQuestion.game,
-        score.userCol  = $rootScope.dbQuestion.user,
-        score.opponent = $rootScope.dbQuestion.opponent
+      console.log(' in else ')
+        console.log($rootScope.dbQuestion.question.game, "+++++++")
+      if ($rootScope.dbQuestion.question) {
+        score.gameID = $rootScope.dbQuestion.question.game;
+        score.opponent = $rootScope.dbQuestion.question.opponent;
+        score.userCol = $rootScope.dbQuestion.question.user
+      } else {
+        score.gameID   = $rootScope.dbQuestion.game;
+        score.userCol  = $rootScope.dbQuestion.user;
+        score.opponent = $rootScope.dbQuestion.opponent;
       }
-    console.log(score.round, "before being sent to socket")
-    Socket.emit('updateScore', score)
-    $rootScope.gameInformation = false;
+      console.log($rootScope.dbQuestion.user)
+      console.log($rootScope.dbQuestion.opponent)
   }
+    $rootScope.gameInformation = false;
+    Socket.emit('updateScore', score)
+}
 
   var lightningRound = function() {
     if ($scope.scoreBoard.round <= 7) {
@@ -254,6 +274,9 @@ angular.module('feud.game', [])
     // refactor to have constant time look up for score values
     var questions = {}
     if (!isLightning) {
+      if(data.question) {
+        data = data.question;
+      }
       questions[$scope.scoreBoard.round] = {
         title: data[0].title,
         responses: []

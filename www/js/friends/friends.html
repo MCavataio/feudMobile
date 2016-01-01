@@ -11,7 +11,7 @@
     <ion-content class="has-header">
     <ion-list>
     <ion-item ng-repeat="friend in user.friends | orderBy: '-name'" ng-click="challenge(friend)"><img class='photo' ng-src="https://graph.facebook.com/{{ friend.id }}/picture?width=50&height=50" /> 
-        <span ng-click="play(friend)"> {{friend.name}} </span>
+        <span> {{friend.name}} </span>
     </ion-item>
   </ion-list>
         
