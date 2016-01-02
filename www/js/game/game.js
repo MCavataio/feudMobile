@@ -131,6 +131,8 @@ angular.module('feud.game', [])
       }
   }
     $rootScope.gameInformation = false;
+    console.log(score.userCol)
+    console.log(score.round, '++++++++++++++++')
     Socket.emit('updateScore', score)
 }
 
