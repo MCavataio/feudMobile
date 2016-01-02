@@ -16,7 +16,13 @@
 <ion-list ng-if="games.opponentTurn">
   <h3> Opponent Turn </h3>
   <ion-item ng-repeat="game in games.opponentTurn">
-    <div class = "enable-pointer-events"> Waiting for {{game.turn}} to play....round: {{game.round}} </div>
+    <div> Waiting for {{game.turn}} to play....round: {{game.round}} </div>
+</ion-item>
+</ion-list>
+<ion-list ng-if="games.finished">
+  <h3> Finished </h3>
+  <ion-item ng-repeat="game in games.finished">
+    <div class ="enable-pointer-events"> Waiting for {{game.turn}} to play....round: {{game.round}} </div>
 </ion-item>
 </ion-list>
 

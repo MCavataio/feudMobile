@@ -11,9 +11,10 @@ angular.module('feud.home', [])
     Socket.emit('updateHome', $rootScope.user)
   });
   Socket.on('updateHome', function(data) {
-    console.log(data, "should render")
+    console.log('should have been called')
       $scope.games.yourTurn = data.yourTurn;
-      $scope.games.opponentTurn = data.opponentTurn
+      $scope.games.opponentTurn = data.opponentTurn;
+      $scope.games.finished = data.finished;
   })
   $scope.startGame = function(game) {
     var queries = [];

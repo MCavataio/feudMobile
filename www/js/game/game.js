@@ -10,7 +10,7 @@ angular.module('feud.game', [])
   $scope.scoreBoard.opponentScore = 0;
   $scope.queryAnswer = {};
   $scope.lightningRound = false;
-  var gameTimer = 5;
+  var gameTimer = 1;
   var lightning = 5;
 
 
@@ -25,6 +25,8 @@ angular.module('feud.game', [])
   
   function init() {
     setScoreBoard(0,0,0)
+    $scope.resultBoard = false;
+    $scope.lightningRound = false;
     $scope.resultBoard = false;
     startRound($rootScope.dbQuestion);
     $scope.queryAnswer = {};
@@ -91,7 +93,7 @@ angular.module('feud.game', [])
   }
 
   var updateScore = function() {
-    console.log('in updatae Score')
+    console.log($scope.scoreBoard.round)
     var score = {
       score: $scope.scoreBoard.roundScore,
       round: $scope.scoreBoard.round,
@@ -100,10 +102,10 @@ angular.module('feud.game', [])
       if ($rootScope.gameInformation.user == 'user2' && score.round !== 2) {
         if ($scope.scoreBoard.round == 3) {
           score.round = 4;         
-        }else if ($scope.scoreBoard.round == 8) {
-          score.round = 5
-        }
-      } if($rootScope.gameInformation.friendly) {
+      } 
+    }else if ($rootScope.gameInformation.user == 'user2' && score.round == 8) {
+        score.round = 5;
+      } else if($rootScope.gameInformation.friendly) {
         if ($rootScope.gameInformation.user == 'user2') {
           if (score.round == 2) {
             score.round = 2;
@@ -111,27 +113,22 @@ angular.module('feud.game', [])
           }
         }
       }
-      else 
-        if ($scope.scoreBoard.round == 8) {
-          score.round = 4
-        }
       score.gameID = $rootScope.gameInformation.gameID,
       score.userCol = $rootScope.gameInformation.user,
       score.opponent = $rootScope.gameInformation.opponent
     } else {
       console.log(' in else ')
         console.log($rootScope.dbQuestion.question.game, "+++++++")
-      if ($rootScope.dbQuestion.question) {
+      if ($rootScope.dbQuestion.question.opponent) {
         score.gameID = $rootScope.dbQuestion.question.game;
         score.opponent = $rootScope.dbQuestion.question.opponent;
         score.userCol = $rootScope.dbQuestion.question.user
       } else {
+        console.log('in the right else and', $rootScope.dbQuestion.opponent)
         score.gameID   = $rootScope.dbQuestion.game;
         score.userCol  = $rootScope.dbQuestion.user;
         score.opponent = $rootScope.dbQuestion.opponent;
       }
-      console.log($rootScope.dbQuestion.user)
-      console.log($rootScope.dbQuestion.opponent)
   }
     $rootScope.gameInformation = false;
     Socket.emit('updateScore', score)
@@ -144,6 +141,7 @@ angular.module('feud.game', [])
         gameInfo($scope.questions, $scope.scoreBoard.round, true)
         timer(2, lightningRound)
       } else {
+        $scope.lightningRound = false;
         $scope.showRound = false;
         updateScore()
       }
