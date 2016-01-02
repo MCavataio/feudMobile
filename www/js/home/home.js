@@ -10,6 +10,7 @@ angular.module('feud.home', [])
     $scope.user = UserService.getUser();
     console.log('called')
     Socket.emit('updateHome', $scope.user)
+    $state.go('home');
   });
   Socket.on('updateHome', function(data) {
     console.log('should have been called')

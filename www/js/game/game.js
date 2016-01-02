@@ -10,7 +10,7 @@ angular.module('feud.game', [])
   $scope.scoreBoard.opponentScore = 0;
   $scope.queryAnswer = {};
   $scope.lightningRound = false;
-  var gameTimer = 1;
+  var gameTimer = 30;
   var lightning = 5;
 
 
@@ -20,8 +20,11 @@ angular.module('feud.game', [])
 
   $scope.home = function() {
     $scope.resultBoard = false;
-    $state.go('home');
+    $state.go('home')
   };
+  // Socket.on('updateHome', function(data) {
+  //   $state.go('home');
+  // })
   
   function init() {
     setScoreBoard(0,0,0)
