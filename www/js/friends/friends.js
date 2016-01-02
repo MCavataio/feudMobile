@@ -30,8 +30,6 @@ angular.module('feud.friends', [])
         };
         $state.go('game');
     })
-    $scope.home = function() {
-        $state.go('home');
-    }
+  
  
 });

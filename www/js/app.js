@@ -52,7 +52,7 @@ angular.module('feud', [
       controller: 'HomeController'
     })
     .state('friends', {
-      url: '/home',
+      url: '/friends',
       templateUrl: './js/friends/friends.html',
       controller: 'FriendsController'
     })

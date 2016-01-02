@@ -3,14 +3,11 @@ angular.module('feud.home', [])
   $scope.user = UserService.getUser();
   $scope.games = {};
 
-  $scope.query = function() {
-    $state.go('query');
-  }
+
   $scope.$on('$ionicView.enter', function() {
     $scope.user = UserService.getUser();
     console.log('called')
     Socket.emit('updateHome', $scope.user)
-    $state.go('home');
   });
   Socket.on('updateHome', function(data) {
     console.log('should have been called')
